@@ -142,7 +142,7 @@ function GrabberClass:release()
     for _, p in ipairs(tableauPiles) do table.insert(allPiles, p) end
     for _, p in ipairs(foundationPiles) do table.insert(allPiles, p) end
 
-    -- 🧠 Use heldObject (bottom card of stack) to validate placement
+    --use bottom card in stack to check placement
     for _, pile in ipairs(allPiles) do
         if pile:isMouseOver(self.currentMousePos.x, self.currentMousePos.y)
             and pile:canAcceptCard(self.heldObject) then
@@ -151,14 +151,14 @@ function GrabberClass:release()
         end
     end
 
-    -- ✅ Valid drop → add entire stack to new pile
+    -- check, then add entire stack to new pile
     if droppedOnPile then
         for _, card in ipairs(self.heldStack) do
             droppedOnPile:addCard(card)
             card.state = CARD_STATE.IDLE
         end
 
-        -- Flip top card in original tableau pile (if applicable)
+        -- if empty, flip top card in original tableau pile 
         if self.originalPile and self.originalPile.type == "tableau" then
             local top = self.originalPile:topCard()
             if top and not top.faceUp then
@@ -166,7 +166,7 @@ function GrabberClass:release()
             end
         end
 
-        -- Bring top card to front (draw order)
+        -- bring top card to front
         for i, c in ipairs(cardTable) do
             if c == self.heldObject then
                 table.remove(cardTable, i)
@@ -176,7 +176,7 @@ function GrabberClass:release()
         table.insert(cardTable, self.heldObject)
 
     else
-        -- ❌ Invalid drop → return stack to original pile
+        -- bad drop! return stack to pile
         for _, card in ipairs(self.heldStack) do
             self.originalPile:addCard(card)
             card.state = CARD_STATE.IDLE
